@@ -105,6 +105,8 @@ namespace bdg {
         
         auto start_t = std::time(nullptr);
         auto start_time = *std::localtime(&start_t);
+        char start_time_str [80];
+        strftime(start_time_str, 80, "%F %X", &start_time);
         
         hmm->init_random_parameters();
         
@@ -135,7 +137,9 @@ namespace bdg {
             
             auto now = std::time(nullptr);
             auto now_ = *std::localtime(&now);
-            logprogressfile << std::put_time(&now_, "%Y-%m-%d %H:%M:%S") << " ";
+            char now_str [80];
+            strftime(now_str, 80, "%F %X", &now_);
+            logprogressfile << now_str << " ";
             
             logprogressfile << "EM iteration " << it << ", loglik = " << EM_loglik[it] << std::endl;
         }
@@ -147,10 +151,13 @@ namespace bdg {
         // LOG
         auto end_t = std::time(nullptr);
         auto end_time = *std::localtime(&end_t);
+        char end_time_str [80];
+        strftime(end_time_str, 80, "%F %X", &end_time);
+        
         auto duration = std::difftime(end_t, start_t);
         logfile << "{" << std::endl;
-        logfile << "\"start_time\": \"" << std::put_time(&start_time, "%d-%m-%Y %H:%M:%S") << "\", " << std::endl;
-        logfile << "\"end_time\": \"" << std::put_time(&end_time, "%d-%m-%Y %H:%M:%S") << "\", " << std::endl;
+        logfile << "\"start_time\": \"" << start_time_str << "\", " << std::endl;
+        logfile << "\"end_time\": \"" << end_time_str << "\", " << std::endl;
         logfile << "\"duration\": " << duration << ", " << std::endl;
         logfile << "\"Dataset\": \"" << d->filename << "\", " << std::endl;
         logfile << "\"EMiterations\": " << EMiterations << ", " << std::endl;
