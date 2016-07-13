@@ -10,6 +10,9 @@
 #include "FileIO.hpp"
 #include <iostream>
 #include <cassert>
+#include <string.h>
+#include <algorithm>
+
 
 namespace bdg {
     Dataset::Dataset(std::string filename_)
