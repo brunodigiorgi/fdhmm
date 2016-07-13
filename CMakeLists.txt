@@ -6,6 +6,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
 # output dir
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
 
 # cmake modules dir
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -75,15 +76,7 @@ set(project_compile_options
 
 # including include_files is not needed, because cmake automatically generate dependencies
 # this is only needed for generating Xcode projects including header files
-
-if(LINUX)
-    find_library(CBLAS_LIBRARIES cblas HINTS $ENV{LD_LIBRARY_PATH})
-    target_link_libraries(fdhmm_test ${CBLAS_LIBRARIES})
-    find_library(ATLAS_LIBRARIES atlas HINTS $ENV{LD_LIBRARY_PATH})
-    target_link_libraries(fdhmm_test ${ATLAS_LIBRARIES})
-endif()
-
-add_library(fdhmm ${src_files} ${include_files} ${CBLAS_LIBRARIES} ${ATLAS_LIBRARIES})
+add_library(fdhmm ${src_files} ${include_files})
 
 target_compile_options(fdhmm PUBLIC ${project_compile_options})
 
@@ -106,6 +99,10 @@ if(APPLE)
     find_library(frm_Accelerate NAMES Accelerate)
     target_link_libraries(fdhmm_test ${frm_Accelerate})
 elseif(LINUX)
+    find_library(CBLAS_LIBRARIES cblas HINTS $ENV{LD_LIBRARY_PATH})
+    target_link_libraries(fdhmm_test ${CBLAS_LIBRARIES})
+    find_library(ATLAS_LIBRARIES atlas HINTS $ENV{LD_LIBRARY_PATH})
+    target_link_libraries(fdhmm_test ${ATLAS_LIBRARIES})
     find_package(Threads)
     target_link_libraries(fdhmm_test ${CMAKE_THREAD_LIBS_INIT})
 endif()
