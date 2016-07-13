@@ -85,6 +85,14 @@ add_executable(fdhmm_test ${test_files})
 
 target_compile_options(fdhmm_test PUBLIC ${project_compile_options} )
 
+find_package(GTest REQUIRED STATIC)
+include_directories(${GTEST_INCLUDE_DIRS})
+
+target_link_libraries(fdhmm_test
+    ${GTEST_BOTH_LIBRARIES}
+    fdhmm
+)
+
 # Dependencies
 if(APPLE)
     find_library(frm_Accelerate NAMES Accelerate)
@@ -96,11 +104,5 @@ elseif(LINUX)
     target_link_libraries(fdhmm_test ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
-find_package(GTest REQUIRED STATIC)
-include_directories(${GTEST_INCLUDE_DIRS})
 
-target_link_libraries(fdhmm_test
-    ${GTEST_BOTH_LIBRARIES}
-    fdhmm
-)
 
