@@ -23,4 +23,4 @@ The library can easily handle datasets of millions of sequences of different len
 Facilities are provided for training hmm model for prediction of the next observed symbol, using k-fold cross-validation. Model parameters can be saved and restored.
 Thread parallelization is used and can lead to x2 and higher speedup when using multi-core cpu.
 
-Examples are provided in the test folder as test cases. Not the cleanest approach but practical. The file HMMTest.cpp is thoroughly commented, better start from that.
+Examples are momentarily provided in the test folder as test cases. The file HMMTest.cpp is thoroughly commented, better start from that.
