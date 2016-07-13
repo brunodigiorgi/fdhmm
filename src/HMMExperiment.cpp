@@ -12,6 +12,7 @@
 #include <ctime>
 #include <iomanip>
 #include <string.h>
+#include <algorithm>
 #include "Core.hpp"
 
 namespace bdg {

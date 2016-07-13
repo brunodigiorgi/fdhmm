@@ -12,6 +12,7 @@
 #include <ctime>
 #include <iomanip>
 #include <string.h>
+#include <algorithm>
 #include "Core.hpp"
 
 namespace bdg {
@@ -177,7 +178,7 @@ namespace bdg {
         for (int i=0; i<nworkers; i++) {
             int tr_imax = floor((i+1) * tr_k);  // not included
             if(tr_imax == tr_imin)
-                tr_imax = std::min({tr_imax+1, (int)obs->nseq});
+                tr_imax = std::min({(int)(tr_imax+1), (int)(obs->nseq)});
             
             workers[i].set_train_seqs(tr_imin, tr_imax);
             
