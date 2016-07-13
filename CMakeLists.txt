@@ -57,10 +57,13 @@ if(LINUX)
     if(EIGEN3_INCLUDE_DIR)
         include_directories(${EIGEN3_INCLUDE_DIR})
     endif()
+    find_path(CBLAS_INCLUDES NAMES cblas.h PATHS $ENV{C_INCLUDE_PATH})
 endif()
 
 set(include_options
     -I${PROJECT_SOURCE_DIR}/${include_path}/
+    -I$ENV{C_INCLUDE_PATH}
+    -I${CBLAS_INCLUDES}
     -I/usr/local/include
 )
 
@@ -87,7 +90,11 @@ target_compile_options(fdhmm_test PUBLIC ${project_compile_options} )
 if(APPLE)
     find_library(frm_Accelerate NAMES Accelerate)
     target_link_libraries(fdhmm_test ${frm_Accelerate})
+elseif(LINUX)
+    find_library(CBLAS_LIBRARIES cblas PATHS $ENV{LD_LIBRARY_PATH})
+    target_link_libraries(fdhmm_test ${CBLAS_LIBRARIES})
 endif()
+
 
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
