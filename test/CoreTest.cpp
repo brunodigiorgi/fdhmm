@@ -9,10 +9,10 @@
 #include <stdio.h>
 #include "gtest/gtest.h"
 
+#if (defined (__APPLE__))
+
 #include "Core.hpp"
-
 #include <mach/mach_time.h>
-
 class Timer {
 public:
     double abs_to_nanos = 0;
@@ -165,3 +165,5 @@ namespace bdg {
         std::cout << "vsma_dotpr:" << (t.time() - st) << std::endl;
     }
 }
+
+#endif
