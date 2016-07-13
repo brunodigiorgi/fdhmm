@@ -31,9 +31,15 @@
 #include <Accelerate/Accelerate.h>
 #elif defined (USE_EIGEN)
 #include <eigen3/Eigen/Dense>
+extern "C"
+{
 #include <cblas.h>
+}
 #elif defined (USE_UNROLLED_LOOPS)
+extern "C"
+{
 #include <cblas.h>
+}
 #else
 #error "unknown platform"
 #endif
