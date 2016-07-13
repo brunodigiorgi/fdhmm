@@ -66,7 +66,7 @@ set(include_options
 
 #project compile options
 set(project_compile_options
-    ${include_options} -std=gnu++11 -stdlib=libc++)
+    ${include_options} -std=gnu++11)
 
 # library target
 # **************
