@@ -271,7 +271,7 @@ namespace bdg {
         srand(0);  // set the seed
         
         const int n_hs = 1;      // how many configurations of hidden node size
-        int hs_arr[n_hs] = {2};  // hidden node sizes
+        int hs_arr[n_hs] = {4};  // hidden node sizes
         int EMiterations = 4;    // how many Expectation Maximization iterations
         int nfolds = 5;          // k-fold cross validation
         bool shuffle = false;    // shuffle the sequences before k-fold splitting
@@ -291,9 +291,10 @@ namespace bdg {
                              shuffle,
                              EMiterations,
                              nworkers,
-                             HMMExperiment::PredictionType::posterior);
+                             HMMExperiment::PredictionType::posterior,
+                             HMMExperiment::TestingStrategy::test_odd);
         
-        hmmExp.set_nseq(10);
+        hmmExp.set_nseq(100);
         
         for(int i = 0; i < n_hs; i++) {
             int hs = hs_arr[i];

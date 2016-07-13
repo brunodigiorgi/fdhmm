@@ -29,9 +29,23 @@ namespace bdg {
             posterior
         } PredictionType;
         
-        HMMExperiment(std::string dataset, std::string logfile, std::string logprogressfile,
-                      int hs, int nfolds, bool shuffle, int EMiterations, int nworkers,
-                      PredictionType prediction_type);
+        typedef enum TestingStrategy {
+            test_every,
+            test_last,
+            test_odd,
+        } TestingStrategy;
+        
+        HMMExperiment(std::string dataset,
+                      std::string logfile,
+                      std::string logprogressfile,
+                      int hs,
+                      int nfolds,
+                      bool shuffle,
+                      int EMiterations,
+                      int nworkers,
+                      PredictionType prediction_type,
+                      TestingStrategy testing_strat);
+        
         ~HMMExperiment();
         
         void set_dataset(std::string dataset);
@@ -57,7 +71,8 @@ namespace bdg {
         Folds* folds {nullptr};
         Dataset* d {nullptr};
         HMMObservations* obs {nullptr};
-        PredictionType prediction_type {PredictionType::viterbi};
+        PredictionType prediction_type {PredictionType::posterior};
+        TestingStrategy testing_strat {TestingStrategy::test_every};
         
         int nworkers {4};
         std::vector<HMMWorkerThread> workers;
@@ -74,8 +89,12 @@ namespace bdg {
         double* NU {nullptr}; // = new double[hs];
         
         double* EM_loglik {nullptr}; // = new double[EMiterations];
-        double* EM_te_entropy {nullptr}; // = new double[EMiterations];
-        double* EM_tr_entropy {nullptr}; // = new double[EMiterations];
+        
+        // length depends on testing strategy
+        double* EM_test_it {nullptr};
+        double* EM_te_entropy {nullptr};
+        double* EM_tr_entropy {nullptr};
+        int EM_test_counter {0};
         
         int* tr_set {nullptr}; // = new int[n];
         int* te_set {nullptr}; // = new int[n];

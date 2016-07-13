@@ -19,7 +19,7 @@ namespace bdg {
     
     HMMExperiment::HMMExperiment(std::string dataset, std::string logfile_, std::string logprogressfile_,
                                  int hs_, int nfolds_, bool shuffle_, int EMiterations_, int nworkers_,
-                                 PredictionType prediction_type_)
+                                 PredictionType prediction_type_, TestingStrategy testing_strat_)
     : logfile(logfile_, std::ofstream::app), logprogressfile(logprogressfile_, std::ofstream::out) {
         assert(logfile.good());
         assert(logprogressfile.good());
@@ -33,6 +33,7 @@ namespace bdg {
         shuffle = shuffle_;
         EMiterations = EMiterations_;
         prediction_type = prediction_type_;
+        testing_strat = testing_strat_;
         
         set_dataset(dataset);
     }
@@ -56,8 +57,15 @@ namespace bdg {
         NU = new double[hs];
         
         EM_loglik = new double[EMiterations];
-        EM_te_entropy = new double[EMiterations];
-        EM_tr_entropy = new double[EMiterations];
+        
+        int length = EMiterations;
+        if(testing_strat == TestingStrategy::test_last)
+            length = 1;
+        if(testing_strat == TestingStrategy::test_odd)
+            length = EMiterations / 2;
+        EM_te_entropy = new double[length];
+        EM_tr_entropy = new double[length];
+        EM_test_it = new double[length];
         
         tr_set = new int[obs->nseq];
         te_set = new int[obs->nseq];
@@ -77,6 +85,7 @@ namespace bdg {
         if(EM_loglik != nullptr) {delete[] EM_loglik; EM_loglik = nullptr;}
         if(EM_te_entropy != nullptr) {delete[] EM_te_entropy; EM_te_entropy = nullptr;}
         if(EM_tr_entropy != nullptr) {delete[] EM_tr_entropy; EM_tr_entropy = nullptr;}
+        if(EM_test_it != nullptr) {delete[] EM_test_it; EM_test_it = nullptr;}
     }
     
     void HMMExperiment::set_dataset(std::string dataset) {
@@ -142,6 +151,7 @@ namespace bdg {
             
             // learn parameters
             double absdif;
+            EM_test_counter = 0;
             for(int it = 0; it < EMiterations; it++) {
                 
                 for(HMMWorkerThread & w : workers)
@@ -170,32 +180,47 @@ namespace bdg {
                 
                 logprogressfile << "EM iteration " << it << ", loglik = " << EM_loglik[it] << std::endl;
                 
-                if(prediction_type == PredictionType::viterbi){
+                if(TestingStrategy::test_every ||
+                   (TestingStrategy::test_odd && (it % 2 == 1)) ||
+                   (TestingStrategy::test_last && (it == EMiterations-1))) {
+                    
+                    if(prediction_type == PredictionType::viterbi){
+                        for(HMMWorkerThread & w : workers)
+                            w.run_crossentropy_viterbi();
+                    } else if(prediction_type == PredictionType::posterior) {
+                        for(HMMWorkerThread & w : workers)
+                            w.run_crossentropy_posterior();
+                    }
+                    
                     for(HMMWorkerThread & w : workers)
-                        w.run_crossentropy_viterbi();
-                } else if(prediction_type == PredictionType::posterior) {
-                    for(HMMWorkerThread & w : workers)
-                        w.run_crossentropy_posterior();
+                        w.join();
+                    
+                    double tr_entropy = 0;
+                    double te_entropy = 0;
+                    
+                    int tr_count = 0;
+                    int te_count = 0;
+                    for(HMMWorkerThread & w : workers) {
+                        tr_entropy += w.tr_entropy;
+                        tr_count += w.tr_count;
+                        te_entropy += w.te_entropy;
+                        te_count += w.te_count;
+                    }
+                    
+                    EM_tr_entropy[EM_test_counter] = tr_entropy / tr_count;
+                    EM_te_entropy[EM_test_counter] = te_entropy / te_count;
+                    EM_test_it[EM_test_counter] = it;
+                    
+                    now = std::time(nullptr);
+                    now_ = *std::localtime(&now);
+                    strftime(now_str, 80, "%F %X", &now_);
+                    logprogressfile << now_str << " ";
+                    
+                    logprogressfile << "tr_entropy: " << EM_tr_entropy[EM_test_counter] <<
+                    ", te_entropy: " << EM_te_entropy[EM_test_counter] << std::endl;
+                    EM_test_counter++;
+                    
                 }
-                
-                for(HMMWorkerThread & w : workers)
-                    w.join();
-                
-                EM_tr_entropy[it] = 0;
-                int tr_count = 0;
-                EM_te_entropy[it] = 0;
-                int te_count = 0;
-                for(HMMWorkerThread & w : workers) {
-                    EM_tr_entropy[it] += w.tr_entropy;
-                    tr_count += w.tr_count;
-                    EM_te_entropy[it] += w.te_entropy;
-                    te_count += w.te_count;
-                }
-                EM_tr_entropy[it] /= tr_count;
-                EM_te_entropy[it] /= te_count;
-                
-                logprogressfile << "tr_entropy: " << EM_tr_entropy[it] <<
-                ", te_entropy: " << EM_te_entropy[it] << std::endl;
             }
             
             // hmm->print_parameters();
@@ -219,8 +244,9 @@ namespace bdg {
             logfile << "\"nseq\": " << folds->n << ", " << std::endl;
             logfile << "\"EMiterations\": " << EMiterations << ", " << std::endl;
             logfile << "\"EM_loglik\": " << "[" << v_to_str(EMiterations, EM_loglik) << "], " << std::endl;
-            logfile << "\"EM_te_entropy\": " << "[" << v_to_str(EMiterations, EM_te_entropy) << "], " << std::endl;
-            logfile << "\"EM_tr_entropy\": " << "[" << v_to_str(EMiterations, EM_tr_entropy) << "], " << std::endl;
+            logfile << "\"EM_te_entropy\": " << "[" << v_to_str(EM_test_counter, EM_te_entropy) << "], " << std::endl;
+            logfile << "\"EM_tr_entropy\": " << "[" << v_to_str(EM_test_counter, EM_tr_entropy) << "], " << std::endl;
+            logfile << "\"EM_test_it\": " << "[" << v_to_str(EM_test_counter, EM_test_it) << "], " << std::endl;
             logfile << "\"hs\": " << hs << ", " << std::endl;
             logfile << "\"nworkers\": " << nworkers << ", " << std::endl;
             logfile << "\"entropy\": " << EM_te_entropy[EMiterations - 1] << ", " << std::endl;
