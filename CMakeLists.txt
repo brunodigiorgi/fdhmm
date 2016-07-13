@@ -92,10 +92,11 @@ if(APPLE)
 elseif(LINUX)
     find_library(CBLAS_LIBRARIES cblas PATHS $ENV{LD_LIBRARY_PATH})
     target_link_libraries(fdhmm_test ${CBLAS_LIBRARIES})
+    find_package(Threads)
+    target_link_libraries(fdhmm_test ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
-
-find_package(GTest REQUIRED)
+find_package(GTest REQUIRED STATIC)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 target_link_libraries(fdhmm_test
