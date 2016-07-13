@@ -62,7 +62,6 @@ endif()
 
 set(include_options
     -I${PROJECT_SOURCE_DIR}/${include_path}/
-    -I$ENV{C_INCLUDE_PATH}
     -I${CBLAS_INCLUDES}
     -I/usr/local/include
 )
@@ -100,7 +99,7 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 target_link_libraries(fdhmm_test
-    ${GTEST_LIBRARIES}
+    ${GTEST_BOTH_LIBRARIES}
     fdhmm
 )
 
