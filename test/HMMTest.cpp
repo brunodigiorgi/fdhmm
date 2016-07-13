@@ -135,7 +135,7 @@ namespace bdg {
         int EMiterations = 100;    // how many Expectation Maximization iterations
         int nworkers = 4;        // for parallelization
         
-        std::string dataset = "../../dataset/dataset.dat";
+        std::string dataset = "../dataset/dataset.dat";
         
         std::string logfile = "results_logfile.txt";
         std::string logprogressfile = "logfile.txt";
