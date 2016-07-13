@@ -51,7 +51,7 @@ set(include_files
 )
 
 # Dependencies
-set(ar_libgtest /usr/local/lib/libgtest.a)
+find_package(GTest REQUIRED)
 
 # libraries and Frameworks
 
@@ -65,6 +65,7 @@ endif()
 set(include_options
     -I${PROJECT_SOURCE_DIR}/${include_path}/
     -I/usr/local/include
+    ${GTEST_INCLUDE_DIRS}
 )
 
 #project compile options
@@ -87,7 +88,7 @@ add_executable(fdhmm_test ${test_files})
 target_compile_options(fdhmm_test PUBLIC ${project_compile_options} )
 
 target_link_libraries(fdhmm_test
-    ${ar_libgtest}
+    ${GTEST_LIBRARIES}
     ${frm_Accelerate}
     fdhmm
 )
