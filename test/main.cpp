@@ -11,7 +11,7 @@
 int main(int argc, char * argv[]) {
     
     testing::InitGoogleTest(&argc, argv);
-    testing::FLAGS_gtest_filter = "HMMTest.trainer";
+    testing::FLAGS_gtest_filter = "HMMTest.HMMExperiment";
     assert(RUN_ALL_TESTS() == 0);
     
     return 0;

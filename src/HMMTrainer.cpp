@@ -172,12 +172,16 @@ namespace bdg {
     }
     
     void HMMTrainer::assign_sequences_to_workers() {
-        double tr_k = obs->nseq / nworkers;
+        double tr_k = obs->nseq / (float)nworkers;
+        int tr_imin = 0;
         for (int i=0; i<nworkers; i++) {
-            int tr_imin = floor(i * tr_k);
             int tr_imax = floor((i+1) * tr_k);  // not included
+            if(tr_imax == tr_imin)
+                tr_imax = std::min({tr_imax+1, (int)obs->nseq});
             
             workers[i].set_train_seqs(tr_imin, tr_imax);
+            
+            tr_imin = std::max({tr_imin, tr_imax});
         }
     }
     

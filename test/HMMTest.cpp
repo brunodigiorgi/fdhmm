@@ -293,6 +293,8 @@ namespace bdg {
                              nworkers,
                              HMMExperiment::PredictionType::posterior);
         
+        hmmExp.set_nseq(10);
+        
         for(int i = 0; i < n_hs; i++) {
             int hs = hs_arr[i];
             

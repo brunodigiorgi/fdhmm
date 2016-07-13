@@ -231,17 +231,24 @@ namespace bdg {
     }
     
     void HMMExperiment::assign_sequences_to_workers(int tr_size, int* tr_set, int te_size, int* te_set) {
-        double tr_k = tr_size / nworkers;
-        double te_k = te_size / nworkers;
+        double tr_k = tr_size / (float)nworkers;
+        double te_k = te_size / (float)nworkers;
+        int tr_imin = 0;
+        int te_imin = 0;
         for (int i=0; i<nworkers; i++) {
-            int tr_imin = floor(i * tr_k);
             int tr_imax = floor((i+1) * tr_k);  // not included
-            int tr_n = tr_imax - tr_imin;
+            if(tr_imax == tr_imin)
+                tr_imax = std::min({tr_imax+1, tr_size});
+            int tr_n = std::max({tr_imax - tr_imin, 0});
             
-            int te_imin = floor(i * te_k);
             int te_imax = floor((i+1) * te_k);  // not included
-            int te_n = te_imax - te_imin;
+            if(te_imax == te_imin)
+                te_imax = std::min({te_imax+1, te_size});
+            int te_n = std::max({te_imax - te_imin, 0});
             workers[i].set_seqs(tr_n, tr_set + tr_imin, te_n, te_set + te_imin);
+            
+            tr_imin = std::max({tr_imin, tr_imax});
+            te_imin = std::max({te_imin, te_imax});
         }
     }
     
