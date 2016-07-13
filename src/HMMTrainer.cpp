@@ -86,6 +86,8 @@ namespace bdg {
     void HMMTrainer::set_hs(int hs_) {
         hs = hs_;
         
+        logprogressfile << "*** hidden size: " << hs << " *** " << std::endl;
+        
         if(hmm != nullptr) {delete hmm; hmm = nullptr;}
         hmm = new HMM(hs, os);
         hmm->set_observations(obs);

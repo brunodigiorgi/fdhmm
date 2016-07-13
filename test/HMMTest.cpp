@@ -296,7 +296,6 @@ namespace bdg {
         for(int i = 0; i < n_hs; i++) {
             int hs = hs_arr[i];
             
-            std::cout << "*** hidden size: " << hs << " *** " << std::endl;
             hmmExp.set_hs(hs);
             
             for(int irep = 0; irep < nrep; irep++)
