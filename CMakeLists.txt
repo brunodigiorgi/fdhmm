@@ -50,22 +50,18 @@ set(include_files
     ${include_path}/Core.hpp
 )
 
-# Dependencies
-find_package(GTest REQUIRED)
-
 # libraries and Frameworks
 
-if(APPLE)
-    find_library(frm_Accelerate NAMES Accelerate)
-elseif(LINUX)
+if(LINUX)
     find_package(Eigen3)
-    include_directories(${EIGEN3_INCLUDE_DIR})
+    if(EIGEN3_INCLUDE_DIR)
+        include_directories(${EIGEN3_INCLUDE_DIR})
+    endif()
 endif()
 
 set(include_options
     -I${PROJECT_SOURCE_DIR}/${include_path}/
     -I/usr/local/include
-    ${GTEST_INCLUDE_DIRS}
 )
 
 #project compile options
@@ -87,9 +83,17 @@ add_executable(fdhmm_test ${test_files})
 
 target_compile_options(fdhmm_test PUBLIC ${project_compile_options} )
 
+# Dependencies
+if(APPLE)
+    find_library(frm_Accelerate NAMES Accelerate)
+    target_link_libraries(fdhmm_test ${frm_Accelerate})
+endif()
+
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+
 target_link_libraries(fdhmm_test
     ${GTEST_LIBRARIES}
-    ${frm_Accelerate}
     fdhmm
 )
 
