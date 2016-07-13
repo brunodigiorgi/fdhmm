@@ -11,6 +11,7 @@
 #include <sstream>
 #include <ctime>
 #include <iomanip>
+#include <string.h>
 #include "Core.hpp"
 
 namespace bdg {
