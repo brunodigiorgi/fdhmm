@@ -7,6 +7,7 @@
 //
 
 #include "HMMWorkerThread.hpp"
+#include <string.h>
 
 namespace bdg {
     
