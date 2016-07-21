@@ -180,9 +180,9 @@ namespace bdg {
                 
                 logprogressfile << "EM iteration " << it << ", loglik = " << EM_loglik[it] << std::endl;
                 
-                if(TestingStrategy::test_every ||
-                   (TestingStrategy::test_odd && (it % 2 == 1)) ||
-                   (TestingStrategy::test_last && (it == EMiterations-1))) {
+                if((testing_strat == TestingStrategy::test_every) ||
+                   ((testing_strat == TestingStrategy::test_odd) && (it % 2 == 1)) ||
+                   ((testing_strat == TestingStrategy::test_last) && (it == EMiterations-1))) {
                     
                     if(prediction_type == PredictionType::viterbi){
                         for(HMMWorkerThread & w : workers)
