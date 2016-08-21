@@ -249,7 +249,7 @@ namespace bdg {
             logfile << "\"EM_test_it\": " << "[" << v_to_str(EM_test_counter, EM_test_it) << "], " << std::endl;
             logfile << "\"hs\": " << hs << ", " << std::endl;
             logfile << "\"nworkers\": " << nworkers << ", " << std::endl;
-            logfile << "\"entropy\": " << EM_te_entropy[EMiterations - 1] << ", " << std::endl;
+            logfile << "\"entropy\": " << EM_te_entropy[EM_test_counter - 1] << ", " << std::endl;
             logfile << "\"fn_params\": \"" << filename << "\", " << std::endl;
             logfile << "}," << std::endl;
             logfile << std::endl;

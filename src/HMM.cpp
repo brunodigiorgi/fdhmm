@@ -356,7 +356,8 @@ namespace bdg {
      ------------maxi = np.argmax(prob)
      
      ------------T2[t,st] = maxi
-     ------------T1[t,st] = prob[maxi] + eplog[st, obs[t]]
+     ------------T1[t,st] = prob[maxi]
+     --------T1[t, :] += eplog[:, obs[t]]
      
      ----# best last state
      ----x = np.zeros(n, dtype=np.int)
